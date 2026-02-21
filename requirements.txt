@@ -102,8 +102,6 @@ prometheus_client==0.21.1
 prompt_toolkit==3.0.50
 propcache==0.4.1
 psutil==7.0.0
-psycopg2 @ file:///C:/Users/zack%20marvin/Desktop/psycopg2-2.9.10-cp313-cp313-win_amd64.whl#sha256=91fd603a2155da8d0cfcdbf8ab24a2d54bca72795b90d2a3ed2b6da8d979dee2
-psycopg2-binary==2.9.10
 pure_eval==0.2.3
 PyAudio==0.2.14
 pycparser==2.22
