@@ -1,0 +1,109 @@
+body {
+    font-family: 'Courier New', monospace;
+    background: linear-gradient(135deg, #fff8e7, #fceabb);
+    margin: 0;
+}
+
+.container {
+    width: 90%;
+    max-width: 800px;
+    margin: 50px auto;
+}
+table {
+width: 100%;
+border-collapse: collapse;
+margin-top: 20px;
+}
+
+th, td {
+padding: 10px;
+border-bottom: 1px solid #ddd;
+}
+
+button {
+background: #ffd166;
+border: none;
+padding: 6px 10px;
+cursor: pointer;
+}
+.token-card {
+display: flex;
+align-items: center;
+gap: 10px;
+margin-bottom: 10px;
+background: #fff;
+padding: 10px;
+border-radius: 6px;
+box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.token-card input {
+flex: 1;
+border: none;
+background: #f5f5f5;
+padding: 8px;
+font-family: monospace;
+}
+
+.active {
+color: green;
+font-weight: bold;
+}
+.token-generated {
+background: #e8f9e9;
+padding: 15px;
+border-radius: 6px;
+margin-bottom: 20px;
+}
+
+.token-generated input {
+width: 100%;
+padding: 8px;
+font-family: monospace;
+margin-bottom: 10px;
+}
+.inactive {
+color: red;
+font-weight: bold;
+}
+
+.card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 5px 5px 0px #ffd166;
+}
+table {
+width: 100%;
+border-collapse: collapse;
+}
+
+th, td {
+padding: 10px;
+border-bottom: 1px solid #ddd;
+text-align: left;
+}
+
+button {
+    background: #ffd166;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+input {
+    padding: 10px;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+img {
+    width: 80px;
+    border-radius: 8px;
+}
+
+.error {
+    color: red;
+}

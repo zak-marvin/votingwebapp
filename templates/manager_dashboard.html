@@ -1,0 +1,44 @@
+<link rel="stylesheet" href="/static/css/style.css">
+
+<div class="container">
+
+<h1>Campaign Manager Panel</h1>
+
+<div class="card">
+    <h2>{{ candidate.name }}</h2>
+    <p><strong>Position:</strong> {{ candidate.position.name }}</p>
+
+    <div class="stats-box">
+        <h3>Votes: <span id="voteCount">{{ votes }}</span></h3>
+        <h3>Percentage: <span id="percentage">{{ percentage }}</span>%</h3>
+        <h3>Ranking: {{ ranking }} / {{ total_candidates }}</h3>
+    </div>
+
+    <div class="progress-bar">
+        <div id="progressFill"></div>
+    </div>
+
+</div>
+
+</div>
+<script>
+function setProgress(percent) {
+    document.getElementById("progressFill").style.width = percent + "%";
+}
+
+function refreshStats() {
+    fetch("/manager/live-stats/")
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById("voteCount").innerText = data.votes;
+        document.getElementById("percentage").innerText = data.percentage;
+
+        setProgress(data.percentage);
+    });
+}
+
+// Set initial progress
+setProgress({{ percentage }});
+
+setInterval(refreshStats, 60000);
+</script>

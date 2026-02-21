@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Statistics</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <h1>Live Statistics Dashboard</h1>
+
+    {% for position in positions %}
+    <div class="card">
+        <h2>{{ position.name }}</h2>
+        <canvas id="chart_{{ position.id }}"></canvas>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+
+    const positionIds = [
+        {% for position in positions %}
+            {{ position.id }},
+        {% endfor %}
+    ];
+
+    positionIds.forEach(id => {
+        loadStats(id);
+        setInterval(() => loadStats(id), 60000);
+    });
+
+    function loadStats(positionId) {
+        fetch(`/api/stats/${positionId}/`)
+            .then(res => res.json())
+            .then(data => {
+
+                // Sort highest first
+                data.sort((a, b) => b.percent - a.percent);
+
+                const labels = data.map(c => `${c.name} (${c.percent}%)`);
+                const values = data.map(c => c.percent);
+
+                // Medal colors
+                const colors = data.map((c, index) => {
+                    if (index === 0) return "#FFD700";  // Gold
+                    if (index === 1) return "#C0C0C0";  // Silver
+                    if (index === 2) return "#CD7F32";  // Bronze
+                    return "#ffd166";                   // Default retro
+                });
+
+                const ctx = document
+                    .getElementById(`chart_${positionId}`)
+                    .getContext("2d");
+
+                // Destroy previous chart if exists
+                if (window[`chart_${positionId}`]) {
+                    window[`chart_${positionId}`].destroy();
+                }
+
+                window[`chart_${positionId}`] = new Chart(ctx, {
+                    type: "bar",
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: "Vote Percentage",
+                            data: values,
+                            backgroundColor: colors
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        }
+                    }
+                });
+
+            });
+    }
+
+});
+</script>
+
+</body>
+</html>

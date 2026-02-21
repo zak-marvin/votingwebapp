@@ -1,0 +1,119 @@
+<link rel="stylesheet" href="/static/css/style.css">
+
+<div class="container">
+
+<h1>Admin Dashboard</h1>
+
+<h2>📊 Live Summary</h2>
+<p><strong>Total Votes Cast:</strong> {{ total_votes }}</p>
+
+<hr>
+
+<h2>Create Position</h2>
+<form method="POST">
+    {% csrf_token %}
+    <input type="text" name="position_name" placeholder="Position name">
+    <button name="create_position">Create</button>
+</form>
+
+<h2>Existing Positions</h2>
+<ul>
+{% for position in positions %}
+<li>
+    {{ position.name }}
+    <form method="POST" style="display:inline;">
+        {% csrf_token %}
+        <button name="delete_position" value="{{ position.id }}">🗑 Delete</button>
+    </form>
+</li>
+{% endfor %}
+</ul>
+
+<hr>
+
+<h2>Create Candidate</h2>
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="text" name="candidate_name" placeholder="Candidate name">
+
+    <select name="candidate_position">
+        {% for position in positions %}
+        <option value="{{ position.id }}">{{ position.name }}</option>
+        {% endfor %}
+    </select>
+
+    <input type="file" name="candidate_photo">
+    <button name="create_candidate">Create</button>
+</form>
+
+<hr>
+
+<h2>Existing Candidates</h2>
+
+<table>
+<tr>
+<th>Name</th>
+<th>Position</th>
+<th>Votes</th>
+<th>Managers</th>
+<th>Edit</th>
+</tr>
+
+{% for candidate in candidates %}
+<tr>
+<td>{{ candidate.name }}</td>
+<td>{{ candidate.position.name }}</td>
+<td>{{ candidate.vote_count }}</td>
+<td>{{ candidate.manager_count }}</td>
+<td>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="candidate_id" value="{{ candidate.id }}">
+        <input type="text" name="candidate_name" value="{{ candidate.name }}">
+
+        <select name="candidate_position">
+            {% for position in positions %}
+            <option value="{{ position.id }}"
+            {% if candidate.position.id == position.id %}selected{% endif %}>
+            {{ position.name }}
+            </option>
+            {% endfor %}
+        </select>
+
+        <input type="file" name="candidate_photo">
+        <button name="edit_candidate">✏ Save</button>
+    </form>
+</td>
+</tr>
+{% endfor %}
+
+</table>
+
+<hr>
+
+<a href="/dashboard/admin/tokens/">🔑 Manage Tokens</a>
+<br><br>
+<a href="/statistics/">📊 View Live Statistics</a>
+
+</div>
+<script>
+function refreshSummary() {
+    fetch("/admin/live-summary/")
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById("totalVotes").innerText = data.total_votes;
+
+        let leaderDiv = document.getElementById("leaders");
+        leaderDiv.innerHTML = "";
+
+        data.leaders.forEach(item => {
+            leaderDiv.innerHTML += 
+            "<p><strong>" + item.position + "</strong>: " +
+            item.leader + " (" + item.votes + " votes)</p>";
+        });
+    });
+}
+
+setInterval(refreshSummary, 60000);
+refreshSummary();
+</script>
