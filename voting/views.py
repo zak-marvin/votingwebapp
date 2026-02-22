@@ -277,7 +277,6 @@ def vote(request):
                 candidate_id = request.POST.get(f"position_{position.id}")
                 if candidate_id:
                     Vote.objects.create(
-                        token=token,
                         position=position,
                         candidate_id=candidate_id
                     )
