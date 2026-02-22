@@ -1,39 +1,130 @@
-<link rel="stylesheet" href="/static/css/style.css">
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoteSafe | Admin Dashboard</title>
 
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+<style>
+body {
+    font-family: 'Public Sans', sans-serif;
+    background: #f8fafc;
+    margin: 0;
+}
+.container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 2rem;
+}
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+h1 { margin-bottom: 2rem; }
+h2 { margin-bottom: 1rem; }
+
+input, select {
+    padding: 0.6rem;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+button {
+    padding: 0.6rem 1rem;
+    border-radius: 8px;
+    border: none;
+    background: #135bec;
+    color: white;
+    cursor: pointer;
+}
+button:hover { background: #0e46b8; }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 0.8rem;
+    border-bottom: 1px solid #eee;
+}
+th {
+    background: #f1f5f9;
+    text-align: left;
+}
+.badge {
+    background: #e0edff;
+    color: #135bec;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+}
+.actions form {
+    display: inline;
+}
+</style>
+</head>
+<body>
+<!-- Navbar -->
+<nav style="background:#135bec; color:white; padding:1rem; display:flex; gap:2rem; align-items:center;">
+    <a href="" style="color:white; text-decoration:none; font-weight:bold;">🏠 Home</a>
+    <a href="/dashboard/admin/tokens/" style="color:white; text-decoration:none; font-weight:bold;">🔑 Manage Tokens</a>
+    <a href="/statistics/" style="color:white; text-decoration:none; font-weight:bold;">📊 Live Statistics</a>
+</nav>
+
+<div class="container" style="margin-top: 1.5rem;">
+    <!-- existing content for that page -->
+</div>
 <div class="container">
 
 <h1>Admin Dashboard</h1>
 
+<!-- 📊 Live Summary -->
+<div class="card">
 <h2>📊 Live Summary</h2>
-<p><strong>Total Votes Cast:</strong> {{ total_votes }}</p>
+<p><strong>Total Votes Cast:</strong> 
+<span id="totalVotes">{{ total_votes }}</span>
+</p>
+<div id="leaders"></div>
+</div>
 
-<hr>
+<!-- 🏛 Position Management -->
+<div class="card">
+<h2>Position Management</h2>
 
-<h2>
-     Position</h2>
-<form method="POST">
+<form method="POST" style="display:flex; gap:10px; margin-bottom:1rem;">
     {% csrf_token %}
     <input type="text" name="position_name" placeholder="Position name">
     <button name="create_position">Create</button>
 </form>
 
-<h2>Existing Positions</h2>
+<h3>Existing Positions</h3>
 <ul>
 {% for position in positions %}
-<li>
+<li style="margin-bottom:0.5rem;">
     {{ position.name }}
     <form method="POST" style="display:inline;">
         {% csrf_token %}
         <button name="delete_position" value="{{ position.id }}">🗑 Delete</button>
     </form>
 </li>
+{% empty %}
+<li>No positions created.</li>
 {% endfor %}
 </ul>
+</div>
 
-<hr>
-
+<!-- 👤 Candidate Creation -->
+<div class="card">
 <h2>Create Candidate</h2>
-<form method="POST" enctype="multipart/form-data">
+
+<form method="POST" enctype="multipart/form-data" style="display:grid; gap:1rem;">
     {% csrf_token %}
     <input type="text" name="candidate_name" placeholder="Candidate name">
 
@@ -46,9 +137,10 @@
     <input type="file" name="candidate_photo">
     <button name="create_candidate">Create</button>
 </form>
+</div>
 
-<hr>
-
+<!-- 👥 Existing Candidates -->
+<div class="card">
 <h2>Existing Candidates</h2>
 
 <table>
@@ -63,40 +155,51 @@
 {% for candidate in candidates %}
 <tr>
 <td>{{ candidate.name }}</td>
-<td>{{ candidate.position.name }}</td>
+<td><span class="badge">{{ candidate.position.name }}</span></td>
 <td>{{ candidate.vote_count }}</td>
 <td>{{ candidate.manager_count }}</td>
-<td>
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <input type="hidden" name="candidate_id" value="{{ candidate.id }}">
-        <input type="text" name="candidate_name" value="{{ candidate.name }}">
+<td class="actions">
 
-        <select name="candidate_position">
-            {% for position in positions %}
-            <option value="{{ position.id }}"
-            {% if candidate.position.id == position.id %}selected{% endif %}>
-            {{ position.name }}
-            </option>
-            {% endfor %}
-        </select>
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="hidden" name="candidate_id" value="{{ candidate.id }}">
+    <input type="text" name="candidate_name" value="{{ candidate.name }}">
 
-        <input type="file" name="candidate_photo">
-        <button name="edit_candidate">✏ Save</button>
-    </form>
+    <select name="candidate_position">
+        {% for position in positions %}
+        <option value="{{ position.id }}"
+        {% if candidate.position.id == position.id %}selected{% endif %}>
+        {{ position.name }}
+        </option>
+        {% endfor %}
+    </select>
+
+    <input type="file" name="candidate_photo">
+    <button name="edit_candidate">✏ Save</button>
+</form>
+
+</td>
+</tr>
+
+{% empty %}
+<tr>
+<td colspan="5" style="text-align:center; padding:2rem;">
+No candidates registered.
 </td>
 </tr>
 {% endfor %}
-
 </table>
+</div>
 
-<hr>
-
-<a href="/dashboard/admin/tokens/">🔑 Manage Tokens</a>
-<br><br>
+<!-- 🔑 Quick Links -->
+<div class="card">
+<a href="/dashboard/admin/tokens/">🔑 Manage Tokens</a><br><br>
 <a href="/statistics/">📊 View Live Statistics</a>
+</div>
 
 </div>
+
+<!-- 🔄 Live Summary Refresh -->
 <script>
 function refreshSummary() {
     fetch("/admin/live-summary/")
@@ -118,3 +221,6 @@ function refreshSummary() {
 setInterval(refreshSummary, 60000);
 refreshSummary();
 </script>
+
+</body>
+</html>

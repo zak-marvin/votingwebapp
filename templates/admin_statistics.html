@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Voting Statistics - VoteSafe</title>
+
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+
+<!-- Core Styles -->
+<style>
+    :root {
+      --primary-blue: #135bec;
+      --bg-color: #f6f6f8;
+      --text-main: #1a1f36;
+      --text-muted: #4f566b;
+      --white: #ffffff;
+      --border-color: #e3e8ee;
+      --shadow-sm: 0 2px 5px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Public Sans', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      line-height: 1.5;
+    }
+    a { text-decoration: none; color: inherit; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; }
+    h1, h2, h3 { color: var(--primary-blue); margin-top: 0; }
+
+    /* Navbar */
+    nav {
+      background: var(--primary-blue);
+      color: white;
+      padding: 1rem;
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+    nav a { color: white; font-weight: bold; }
+
+    /* Cards */
+    .card {
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 2rem;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+    .card-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .card-title { margin: 0; font-size: 1.25rem; font-weight: 600; }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      padding: 1.5rem;
+    }
+    .stat-box {
+      padding: 1.5rem;
+      background: #fcfcfd;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .stat-label { font-size: 0.875rem; color: var(--text-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.025em; }
+    .stat-value { font-size: 1.75rem; font-weight: 700; color: var(--primary-blue); }
+
+    /* Positions Table */
+    .position-card { background: var(--white); border-radius: 12px; box-shadow: var(--shadow-sm); margin-bottom: 2rem; border: 1px solid var(--border-color); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .position-card:hover { box-shadow: var(--shadow-md); }
+    .table-container { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; margin-bottom: 1rem; }
+    th { background-color: var(--primary-blue); color: var(--white); padding: 0.75rem; font-weight: 500; }
+    td { padding: 0.75rem; border-bottom: 1px solid var(--border-color); }
+    .vote-pill { display: inline-block; padding: 0.25rem 0.75rem; background-color: #ebf2ff; color: var(--primary-blue); border-radius: 6px; font-weight: 600; font-size: 0.875rem; }
+    .no-data { padding: 2rem; text-align: center; color: var(--text-muted); font-style: italic; }
+    .badge-count { font-size: 0.9rem; background: #eef2ff; color: var(--primary-blue); padding: 0.2rem 0.6rem; border-radius: 4px; font-weight: 400; }
+</style>
+</head>
+
+<body>
+
+<!-- Navbar -->
+<nav>
+    <a href="/">🏠 Home</a>
+    <a href="/dashboard/admin/tokens/">🔑 Manage Tokens</a>
+    <a href="#">📊 Live Statistics</a>
+</nav>
+
+<!-- Main Container -->
+<main class="container">
+
+<!-- Overall Stats -->
+<section class="card">
+  <div class="card-header">
+    <h2 class="card-title">Live Voting Overview</h2>
+    <span class="material-symbols-outlined" style="color: var(--text-muted);">monitoring</span>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-box">
+      <span class="stat-label">Total Votes Cast</span>
+      <span class="stat-value" id="total_votes">{{ total_votes }}</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Voter Turnout</span>
+      <span class="stat-value" id="turnout_percentage">{{ turnout_percentage }}%</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Tokens Used</span>
+      <span class="stat-value" id="used_tokens">{{ used_tokens }}</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Total Token Supply</span>
+      <span class="stat-value" id="total_tokens">{{ total_tokens }}</span>
+    </div>
+  </div>
+</section>
+
+<!-- Positions & Candidates -->
+<section>
+  <h2>Election Standings</h2>
+  {% for pos in positions %}
+  <div class="position-card">
+    <div class="card-header">
+      <h3 class="card-title">{{ pos.position }} <span class="badge-count">{{ pos.total_votes }} votes</span></h3>
+      <span class="material-symbols-outlined" style="color: var(--text-muted); opacity: 0.5;">how_to_reg</span>
+    </div>
+    <div class="table-container">
+      {% if pos.candidates %}
+        <table>
+          <thead>
+            <tr>
+              <th>Candidate Name</th>
+              <th style="text-align: right;">Vote Count</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in pos.candidates %}
+            <tr>
+              <td>{{ c.name }}</td>
+              <td style="text-align: right;"><span class="vote-pill">{{ c.votes }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="no-data">No candidates registered for this position yet.</div>
+      {% endif %}
+    </div>
+  </div>
+  {% endfor %}
+</section>
+
+</main>
+
+<!-- Auto-refresh Script -->
+<script>
+function refreshStats() {
+    fetch(window.location.href, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('total_votes').innerText = data.total_votes;
+        document.getElementById('turnout_percentage').innerText = data.turnout_percentage + '%';
+        document.getElementById('used_tokens').innerText = data.used_tokens;
+        document.getElementById('total_tokens').innerText = data.total_tokens;
+        // You can extend this to refresh positions/candidates if JSON contains them
+    })
+    .catch(err => console.error('Error refreshing stats:', err));
+}
+
+// Refresh every 10 seconds
+setInterval(refreshStats, 10000);
+</script>
+
+</body>
+</html>

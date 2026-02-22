@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voting Statistics</title>
+<style>
+  body { font-family: sans-serif; margin: 2rem; background: #f6f6f8; }
+  h1, h2 { color: #135bec; }
+  .position { margin-bottom: 2rem; }
+  .candidates li { margin-left: 1rem; }
+  table { border-collapse: collapse; width: 100%; max-width: 600px; margin-bottom: 2rem; }
+  th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
+  th { background-color: #135bec; color: #fff; }
+</style>
+
+</head>
+<body>
+  <!-- Navbar -->
+<nav style="background:#135bec; color:white; padding:1rem; display:flex; gap:2rem; align-items:center;">
+    <a href="" style="color:white; text-decoration:none; font-weight:bold;">🏠 Home</a>
+    <a href="/dashboard/admin/tokens/" style="color:white; text-decoration:none; font-weight:bold;">🔑 Manage Tokens</a>
+    <a href="" style="color:white; text-decoration:none; font-weight:bold;">📊 Live Statistics</a>
+</nav>
+
+<div class="container" style="margin-top: 1.5rem;">
+    <!-- existing content for that page -->
+</div>
+
+<h1>Voting Statistics</h1>
+
+<h2>Overall Statistics</h2>
+<ul>
+  <li>Total Votes: {{ total_votes }}</li>
+  <li>Turnout: {{ turnout_percentage }}%</li>
+  <li>Used Tokens: {{ used_tokens }}</li>
+  <li>Total Tokens: {{ total_tokens }}</li>
+</ul>
+
+<h2>Positions & Candidates</h2>
+{% for pos in positions %}
+  <div class="position">
+    <h3>{{ pos.position }} ({{ pos.total_votes }} votes)</h3>
+    {% if pos.candidates %}
+      <table>
+        <tr>
+          <th>Candidate</th>
+          <th>Votes</th>
+        </tr>
+        {% for c in pos.candidates %}
+          <tr>
+            <td>{{ c.name }}</td>
+            <td>{{ c.votes }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      <p>No candidates or votes yet.</p>
+    {% endif %}
+  </div>
+{% endfor %}
+
+</body>
+</html>
+<script>
+function refreshStats() {
+    fetch("{% url 'admin_statistics_page' %}")
+        .then(response => response.text())
+        .then(html => {
+            // Parse the returned HTML and extract the main content
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+
+            // Replace the current stats section
+            const newStats = doc.querySelector('body').innerHTML;
+            document.body.innerHTML = newStats;
+        })
+        .catch(err => console.error('Error refreshing stats:', err));
+}
+
+// Refresh every 10 seconds
+setInterval(refreshStats, 100);
+</script>

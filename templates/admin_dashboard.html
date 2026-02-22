@@ -6,195 +6,324 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VoteSafe | Admin Dashboard</title>
 
-<link rel="stylesheet" href="{% static 'css/style.css' %}">
-<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 
 <style>
-body {
-    font-family: 'Public Sans', sans-serif;
-    background: #f8fafc;
-    margin: 0;
+:root {
+    --primary: #135bec;
+    --primary-dark: #0e46b8;
+    --bg: #f6f8fc;
+    --card: #ffffff;
+    --border: #e6e9ef;
+    --text: #1e293b;
+    --muted: #64748b;
 }
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Public Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+/* ================= HEADER ================= */
+
+header {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.badge-admin {
+    margin-left: 10px;
+    background: rgba(19,91,236,0.1);
+    color: var(--primary);
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+nav a {
+    margin-left: 25px;
+    text-decoration: none;
+    color: var(--muted);
+    font-weight: 500;
+}
+
+nav a:hover {
+    color: var(--primary);
+}
+
+/* ================= LAYOUT ================= */
+
 .container {
     max-width: 1200px;
     margin: auto;
     padding: 2rem;
 }
+
 .card {
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.8rem;
     margin-bottom: 2rem;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
 }
-h1 { margin-bottom: 2rem; }
-h2 { margin-bottom: 1rem; }
+
+.card h3 {
+    margin-top: 0;
+}
+
+/* ================= FORMS ================= */
 
 input, select {
-    padding: 0.6rem;
+    padding: 0.7rem 1rem;
     border-radius: 8px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
+    width: 100%;
 }
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
 button {
-    padding: 0.6rem 1rem;
-    border-radius: 8px;
-    border: none;
-    background: #135bec;
+    background: var(--primary);
     color: white;
+    border: none;
+    padding: 0.7rem 1.5rem;
+    border-radius: 8px;
     cursor: pointer;
+    font-weight: 500;
 }
-button:hover { background: #0e46b8; }
+
+button:hover {
+    background: var(--primary-dark);
+}
+
+/* ================= GRID ================= */
+
+.grid {
+    display: grid;
+    gap: 2rem;
+}
+
+.grid-2 {
+    grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 768px) {
+    .grid-2 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ================= TABLE ================= */
 
 table {
     width: 100%;
     border-collapse: collapse;
 }
-th, td {
-    padding: 0.8rem;
-    border-bottom: 1px solid #eee;
-}
+
 th {
-    background: #f1f5f9;
     text-align: left;
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 14px;
+    background: #f1f5f9;
 }
-.badge {
-    background: #e0edff;
-    color: #135bec;
-    padding: 0.3rem 0.7rem;
+
+td {
+    padding: 14px;
+    border-bottom: 1px solid var(--border);
+}
+
+tr:hover {
+    background: #f9fbff;
+}
+
+.position-badge {
+    background: rgba(19,91,236,0.1);
+    color: var(--primary);
+    padding: 4px 10px;
     border-radius: 999px;
-    font-size: 0.75rem;
+    font-size: 12px;
 }
-.actions form {
-    display: inline;
+
+/* ================= SUMMARY ================= */
+
+.summary-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.leaders p {
+    margin: 4px 0;
+    font-size: 14px;
+    color: var(--muted);
 }
 </style>
 </head>
+
 <body>
+
+<header>
+    <div class="logo">
+        <span class="material-symbols-outlined" style="color:var(--primary)">verified_user</span>
+        VoteSafe
+        <span class="badge-admin">Admin Access</span>
+    </div>
+
+    <nav>
+        <a href="/dashboard/admin/tokens/">Manage Tokens</a>
+        <a href="/statistics/">Live Statistics</a>
+    </nav>
+</header>
 
 <div class="container">
 
-<h1>Admin Dashboard</h1>
+<!-- ================= LIVE SUMMARY ================= -->
 
-<!-- 📊 Live Summary -->
 <div class="card">
-<h2>📊 Live Summary</h2>
-<p><strong>Total Votes Cast:</strong> 
-<span id="totalVotes">{{ total_votes }}</span>
-</p>
-<div id="leaders"></div>
+    <h3>Total Votes Cast</h3>
+    <div class="summary-number" id="totalVotes">
+        {{ total_votes }}
+    </div>
+    <div class="leaders" id="leaders"></div>
 </div>
 
-<!-- 🏛 Position Management -->
+<!-- ================= POSITIONS ================= -->
+
 <div class="card">
-<h2>Position Management</h2>
+    <h3>Positions</h3>
 
-<form method="POST" style="display:flex; gap:10px; margin-bottom:1rem;">
-    {% csrf_token %}
-    <input type="text" name="position_name" placeholder="Position name">
-    <button name="create_position">Create</button>
-</form>
-
-<h3>Existing Positions</h3>
-<ul>
-{% for position in positions %}
-<li style="margin-bottom:0.5rem;">
-    {{ position.name }}
-    <form method="POST" style="display:inline;">
+    <form method="POST" style="display:flex; gap:10px; margin-bottom:1rem;">
         {% csrf_token %}
-        <button name="delete_position" value="{{ position.id }}">🗑 Delete</button>
+        <input name="position_name" placeholder="New Position">
+        <button name="create_position">Create</button>
     </form>
-</li>
-{% empty %}
-<li>No positions created.</li>
-{% endfor %}
-</ul>
-</div>
 
-<!-- 👤 Candidate Creation -->
-<div class="card">
-<h2>Create Candidate</h2>
-
-<form method="POST" enctype="multipart/form-data" style="display:grid; gap:1rem;">
-    {% csrf_token %}
-    <input type="text" name="candidate_name" placeholder="Candidate name">
-
-    <select name="candidate_position">
-        {% for position in positions %}
-        <option value="{{ position.id }}">{{ position.name }}</option>
-        {% endfor %}
-    </select>
-
-    <input type="file" name="candidate_photo">
-    <button name="create_candidate">Create</button>
-</form>
-</div>
-
-<!-- 👥 Existing Candidates -->
-<div class="card">
-<h2>Existing Candidates</h2>
-
-<table>
-<tr>
-<th>Name</th>
-<th>Position</th>
-<th>Votes</th>
-<th>Managers</th>
-<th>Edit</th>
-</tr>
-
-{% for candidate in candidates %}
-<tr>
-<td>{{ candidate.name }}</td>
-<td><span class="badge">{{ candidate.position.name }}</span></td>
-<td>{{ candidate.vote_count }}</td>
-<td>{{ candidate.manager_count }}</td>
-<td class="actions">
-
-<form method="POST" enctype="multipart/form-data">
-    {% csrf_token %}
-    <input type="hidden" name="candidate_id" value="{{ candidate.id }}">
-    <input type="text" name="candidate_name" value="{{ candidate.name }}">
-
-    <select name="candidate_position">
-        {% for position in positions %}
-        <option value="{{ position.id }}"
-        {% if candidate.position.id == position.id %}selected{% endif %}>
+    {% for position in positions %}
+    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
         {{ position.name }}
-        </option>
-        {% endfor %}
-    </select>
-
-    <input type="file" name="candidate_photo">
-    <button name="edit_candidate">✏ Save</button>
-</form>
-
-</td>
-</tr>
-
-{% empty %}
-<tr>
-<td colspan="5" style="text-align:center; padding:2rem;">
-No candidates registered.
-</td>
-</tr>
-{% endfor %}
-</table>
+        <form method="POST">
+            {% csrf_token %}
+            <button name="delete_position" value="{{ position.id }}">Delete</button>
+        </form>
+    </div>
+    {% empty %}
+    <p style="color:var(--muted)">No positions created.</p>
+    {% endfor %}
 </div>
 
-<!-- 🔑 Quick Links -->
+<!-- ================= CREATE CANDIDATE ================= -->
+
 <div class="card">
-<a href="/dashboard/admin/tokens/">🔑 Manage Tokens</a><br><br>
-<a href="/statistics/">📊 View Live Statistics</a>
+    <h3>Register Candidate</h3>
+
+    <form method="POST" enctype="multipart/form-data" class="grid grid-2">
+        {% csrf_token %}
+        <input name="candidate_name" placeholder="Candidate Name">
+
+        <select name="candidate_position">
+            {% for position in positions %}
+            <option value="{{ position.id }}">{{ position.name }}</option>
+            {% endfor %}
+        </select>
+
+        <input type="file" name="candidate_photo" style="grid-column:1/-1;">
+
+        <div style="grid-column:1/-1; text-align:right;">
+            <button name="create_candidate">Add Candidate</button>
+        </div>
+    </form>
+</div>
+
+<!-- ================= CANDIDATE TABLE ================= -->
+
+<div class="card">
+    <h3>Candidate List</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Position</th>
+                <th>Votes</th>
+                <th>Managers</th>
+                <th>Edit</th>
+            </tr>
+        </thead>
+
+        <tbody>
+        {% for candidate in candidates %}
+        <tr>
+            <td>{{ candidate.name }}</td>
+            <td>
+                <span class="position-badge">
+                    {{ candidate.position.name }}
+                </span>
+            </td>
+            <td>{{ candidate.vote_count }}</td>
+            <td>{{ candidate.manager_count }}</td>
+
+            <td>
+                <form method="POST" enctype="multipart/form-data" style="display:flex; gap:5px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="candidate_id" value="{{ candidate.id }}">
+                    <input name="candidate_name" value="{{ candidate.name }}">
+                    <select name="candidate_position">
+                        {% for position in positions %}
+                        <option value="{{ position.id }}"
+                        {% if candidate.position.id == position.id %}selected{% endif %}>
+                        {{ position.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <button name="edit_candidate">Save</button>
+                </form>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="5" style="text-align:center; padding:2rem; color:var(--muted);">
+                No candidates registered.
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 </div>
 
 </div>
 
-<!-- 🔄 Live Summary Refresh -->
+<!-- ================= LIVE REFRESH ================= -->
+
 <script>
 function refreshSummary() {
     fetch("/admin/live-summary/")
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
         document.getElementById("totalVotes").innerText = data.total_votes;
 
@@ -202,9 +331,8 @@ function refreshSummary() {
         leaderDiv.innerHTML = "";
 
         data.leaders.forEach(item => {
-            leaderDiv.innerHTML += 
-            "<p><strong>" + item.position + "</strong>: " +
-            item.leader + " (" + item.votes + " votes)</p>";
+            leaderDiv.innerHTML +=
+            `<p><strong>${item.position}</strong>: ${item.leader} (${item.votes} votes)</p>`;
         });
     });
 }
