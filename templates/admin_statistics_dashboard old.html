@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Statistics Panel</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <style>
+        body { font-family: Arial; background: #f4f6f9; margin: 0; padding: 20px; }
+        .container { max-width: 1100px; margin: auto; }
+        .card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .stats-row { display: flex; justify-content: space-between; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        table th, table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        table th { background: #f0f0f0; }
+        h1 { margin-bottom: 20px; }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>👑 Admin Election Control Panel</h1>
+
+    <div class="card">
+        <div class="stats-row">
+            <div>
+                <h3>Total Votes</h3>
+                <p id="totalVotes">0</p>
+            </div>
+
+            <div>
+                <h3>Turnout Percentage</h3>
+                <p><span id="turnoutPercent">0</span>%</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="positionsContainer"></div>
+
+</div>
+
+<script>
+function refreshAdminStats() {
+    fetch("/admin/statistics/")
+    .then(response => response.json())
+    .then(data => {
+
+        document.getElementById("totalVotes").innerText = data.total_votes;
+        document.getElementById("turnoutPercent").innerText = data.turnout_percentage;
+
+        let container = document.getElementById("positionsContainer");
+        container.innerHTML = "";
+
+        data.positions.forEach(position => {
+
+            let card = document.createElement("div");
+            card.className = "card";
+
+            let html = `<h2>${position.position}</h2>`;
+            html += `<table>
+                        <tr>
+                            <th>Candidate</th>
+                            <th>Votes</th>
+                        </tr>`;
+
+            position.candidates.forEach(candidate => {
+                html += `<tr>
+                            <td>${candidate.name}</td>
+                            <td>${candidate.votes}</td>
+                        </tr>`;
+            });
+
+            html += `</table>`;
+            card.innerHTML = html;
+
+            container.appendChild(card);
+        });
+    });
+}
+
+refreshAdminStats();
+setInterval(refreshAdminStats, 5000);
+</script>
+
+</body>
+</html>

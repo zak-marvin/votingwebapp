@@ -1,32 +1,263 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Vote</title>
-    <link rel="stylesheet" href="/static/css/style.css">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VoteSafe | Cast Your Vote</title>
+
+<!-- Custom CSS for cards and layout -->
+<style>
+    body {
+        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        background-color: #f4f7f9;
+        color: #333;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    header {
+        background-color: #fff;
+        border-bottom: 1px solid #e1e8ed;
+        padding: 15px 0;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .logo {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1a73e8;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+    }
+
+    h1 {
+        font-size: 28px;
+        color: #1a202c;
+        margin-bottom: 8px;
+    }
+
+    p.intro {
+        color: #718096;
+        margin-bottom: 30px;
+    }
+
+    form.voting-form {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .position-card {
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid #e1e8ed;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    }
+
+    .position-header {
+        background-color: #f8f9fa;
+        padding: 15px 25px;
+        border-bottom: 1px solid #e1e8ed;
+    }
+
+    .position-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    .candidates-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 20px;
+        padding: 25px;
+    }
+
+    .candidate-option {
+        position: relative;
+        border: 2px solid #e1e8ed;
+        border-radius: 10px;
+        padding: 15px;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        transition: all 0.2s ease;
+    }
+
+    .candidate-option:hover {
+        border-color: #1a73e8;
+        background-color: #f0f7ff;
+    }
+
+    .candidate-option input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .candidate-option:has(input[type="radio"]:checked) {
+        border-color: #1a73e8;
+        background-color: #f0f7ff;
+        box-shadow: 0 0 0 1px #1a73e8;
+    }
+
+    .candidate-photo {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 12px;
+        background-color: #eee;
+        border: 3px solid #fff;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .candidate-name {
+        font-weight: 600;
+        font-size: 16px;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .custom-radio-circle {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #cbd5e0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+
+    .candidate-option:has(input[type="radio"]:checked) .custom-radio-circle {
+        border-color: #1a73e8;
+        background-color: #1a73e8;
+    }
+
+    .candidate-option:has(input[type="radio"]:checked) .custom-radio-circle::after {
+        content: '';
+        width: 8px;
+        height: 8px;
+        background: white;
+        border-radius: 50%;
+    }
+
+    .form-actions {
+        margin-top: 20px;
+        padding: 40px 0;
+        display: flex;
+        justify-content: center;
+    }
+
+    .btn-submit {
+        background-color: #1a73e8;
+        color: #fff;
+        border: none;
+        padding: 16px 40px;
+        font-size: 18px;
+        font-weight: 600;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: background-color 0.2s, transform 0.1s;
+        box-shadow: 0 4px 6px rgba(26, 115, 232, 0.2);
+    }
+
+    .btn-submit:hover {
+        background-color: #1557b0;
+        transform: translateY(-1px);
+    }
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    .btn-icon {
+        width: 20px;
+        height: 20px;
+    }
+</style>
 </head>
 <body>
 
-<div class="container">
-<form method="POST">
+<header>
+<div class="header-content">
+<a class="logo" href="/">VoteSafe</a>
+<div class="security-badge">SECURE SSL ENCRYPTED</div>
+</div>
+</header>
+
+<main class="container">
+<h1>Cast Your Vote</h1>
+<p class="intro">Please review the candidates for each position and make your selections. Your vote is anonymous and secure.</p>
+
+<form method="POST" class="voting-form">
 {% csrf_token %}
 
 {% for position in positions %}
-<div class="card">
-    <h2>{{ position.name }}</h2>
-
-    {% for candidate in position.candidate_set.all %}
-    <div class="candidate">
-        <img src="{{ candidate.photo.url }}">
-        <p>{{ candidate.name }}</p>
-        <input type="radio" name="position_{{ position.id }}" value="{{ candidate.id }}">
+<section class="position-card">
+    <div class="position-header">
+        <h2 class="position-title">{{ position.name }}</h2>
     </div>
-    {% endfor %}
-</div>
+    <div class="candidates-grid">
+        {% for candidate in position.candidate_set.all %}
+        <label class="candidate-option">
+            <input type="radio" name="position_{{ position.id }}" value="{{ candidate.id }}" required>
+            {% if candidate.photo %}
+            <img class="candidate-photo" src="{{ candidate.photo.url }}" alt="{{ candidate.name }}">
+            {% else %}
+            <div class="candidate-photo"></div>
+            {% endif %}
+            <div class="candidate-name">{{ candidate.name }}</div>
+            <div class="custom-radio-circle"></div>
+        </label>
+        {% endfor %}
+    </div>
+</section>
 {% endfor %}
 
-<button type="submit">Submit Votes</button>
-</form>
+<div class="form-actions">
+<button class="btn-submit" type="submit">
+    Submit Votes
+    <svg class="btn-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24">
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+        <polyline points="12 5 19 12 12 19"></polyline>
+    </svg>
+</button>
 </div>
+
+</form>
+</main>
+
+<footer class="container" style="text-align: center; padding-bottom: 40px; color: #a0aec0; font-size: 14px;">
+<p>© 2023 VoteSafe Security Systems. All Rights Reserved.</p>
+<p>Certified Audit-Ready Electronic Voting</p>
+</footer>
 
 </body>
 </html>

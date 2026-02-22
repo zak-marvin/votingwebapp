@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Campaign Manager Panel</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+
+    <style>
+        body { font-family: Arial; background: #f4f6f9; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; }
+        .card { background: white; padding: 25px; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+        .stats-box { display: flex; justify-content: space-between; margin-top: 20px; }
+        .progress-bar { width: 100%; background: #eee; height: 25px; border-radius: 20px; margin-top: 20px; }
+        #progressFill { height: 100%; width: 0%; background: #4CAF50; border-radius: 20px; transition: 0.5s; }
+        .status-leading { color: green; font-weight: bold; }
+        .status-behind { color: red; font-weight: bold; }
+        h1, h2 { margin-bottom: 5px; }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>📊 Campaign Manager Dashboard</h1>
+
+    <div class="card">
+        <h2>{{ candidate.name }}</h2>
+        <p><strong>Position:</strong> {{ candidate.position.name }}</p>
+
+        <div class="stats-box">
+            <div>
+                <h3>Votes</h3>
+                <p id="voteCount">{{ votes }}</p>
+            </div>
+
+            <div>
+                <h3>Percentage</h3>
+                <p><span id="percentage">{{ percentage }}</span>%</p>
+            </div>
+
+            <div>
+                <h3>Ranking</h3>
+                <p id="ranking">{{ ranking }} / {{ total_candidates }}</p>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div id="progressFill"></div>
+        </div>
+
+        <hr style="margin: 25px 0;">
+
+        <h3>Status: <span id="statusText"></span></h3>
+        <h3>Vote Difference: <span id="voteDiff">0</span></h3>
+        <h3>Leader Votes: <span id="leaderVotes">0</span></h3>
+    </div>
+</div>
+
+<script>
+function setProgress(percent) {
+    document.getElementById("progressFill").style.width = percent + "%";
+}
+
+function refreshStats() {
+    fetch("/manager/live-stats/")
+    .then(response => response.json())
+    .then(data => {
+
+        document.getElementById("voteCount").innerText = data.votes;
+        document.getElementById("percentage").innerText = data.percentage;
+        document.getElementById("ranking").innerText = data.ranking + " / {{ total_candidates }}";
+        document.getElementById("voteDiff").innerText = data.vote_diff;
+        document.getElementById("leaderVotes").innerText = data.leader_votes;
+
+        if (data.vote_diff === 0) {
+            document.getElementById("statusText").innerText = "Leading 🟢";
+            document.getElementById("statusText").className = "status-leading";
+        } else {
+            document.getElementById("statusText").innerText = "Behind 🔴";
+            document.getElementById("statusText").className = "status-behind";
+        }
+
+        setProgress(data.percentage);
+    });
+}
+
+setProgress({{ percentage }});
+setInterval(refreshStats, 5000);
+</script>
+
+</body>
+</html>

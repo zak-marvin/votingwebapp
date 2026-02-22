@@ -1,109 +1,246 @@
 {% load static %}
-<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoteSafe | Token Management</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Public Sans', sans-serif;
+    background: #f8fafc;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.card {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+}
+
+h1, h2, h3 {
+    margin-top: 0;
+}
+
+input[type="number"],
+input[type="text"],
+select {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0 15px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    font-size: 14px;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #135bec;
+    box-shadow: 0 0 0 3px rgba(19,91,236,0.1);
+}
+
+button {
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: none;
+    background: #135bec;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button:hover {
+    background: #0e46b8;
+}
+
+button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.token-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #f1f5f9;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+}
+
+.token-card input {
+    flex: 1;
+    margin: 0;
+}
+
+.active {
+    color: #16a34a;
+    font-weight: 600;
+}
+
+.inactive {
+    color: #dc2626;
+    font-weight: 600;
+}
+
+.permissions {
+    background: #f9fafb;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+</style>
+</head>
+<body>
 
 <div class="container">
 
-<h1>🔑 Generate Voter Token</h1>
+    <h1>🔑 Token Management</h1>
 
-<form method="POST">
-    {% csrf_token %}
-    <label>Number of tokens:</label>
-<input type="number" name="voter_quantity" min="1" value="1" required>
+    <!-- Generate Voter Token -->
+    <div class="card">
+        <h2>Generate Voter Token</h2>
 
-    <h3>Token Permissions</h3>
+        <form method="POST">
+            {% csrf_token %}
 
-    <label>
-        <input type="checkbox" name="all_positions" id="allCheck">
-        Allow voting for ALL positions
-    </label>
+            <label>Number of tokens</label>
+            <input type="number" name="voter_quantity" min="1" value="1" required>
 
-    <h4>Or Select Positions:</h4>
+            <div class="permissions">
+                <h3>Token Permissions</h3>
 
-    {% for position in positions %}
-        <label>
-            <input type="checkbox" name="positions" value="{{ position.id }}">
-            {{ position.name }}
-        </label><br>
-    {% endfor %}
+                <label>
+                    <input type="checkbox" name="all_positions" id="allCheck">
+                    Allow voting for ALL positions
+                </label>
 
-    <br>
-    <button type="submit" name="generate_voters">Generate Token</button>
-</form>
+                <h4>Or Select Positions</h4>
 
-<hr>
-<h2>copy</h2>
- {% for token in generated_tokens %}
-        <input type="text" value="{{ token }}" readonly>
-        <button onclick="navigator.clipboard.writeText('{{ token }}')">
-            Copy
-        </button>
-        <br>
-    {% endfor %}
+                {% for position in positions %}
+                    <label>
+                        <input type="checkbox" name="positions" value="{{ position.id }}">
+                        {{ position.name }}
+                    </label><br>
+                {% endfor %}
+            </div>
 
-{% if generated_tokens %}
-    <h3>Generated Voter Tokens</h3>
-    {% for token in generated_tokens %}
-        <input type="text" value="{{ token }}" readonly>
-        <button onclick="navigator.clipboard.writeText('{{ token }}')">
-            Copy
-        </button>
-        <br>
-    {% endfor %}
-{% endif %}
-<hr>
+            <button type="submit" name="generate_voters">
+                Generate Token
+            </button>
+        </form>
 
-<h2>Generate Campaign Manager Token</h2>
+        {% if generated_tokens %}
+            <h3>Generated Voter Tokens</h3>
+            {% for token in generated_tokens %}
+                <div class="token-card">
+                    <input type="text" value="{{ token }}" readonly>
+                    <button type="button" onclick="copyInline(this, '{{ token }}')">
+                        Copy
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
 
-<form method="POST">
-    {% csrf_token %}
-    <label>Number of tokens:</label>
-    <input type="number" name="quantity" min="1" value="1" required>
+    <!-- Generate Campaign Manager Token -->
+    <div class="card">
+        <h2>Generate Campaign Manager Token</h2>
 
-    <label>Select Candidate:</label>
-    <select name="candidate" required>
-        {% for candidate in candidates %}
-            <option value="{{ candidate.id }}">
-                {{ candidate.name }} ({{ candidate.position.name }})
-            </option>
+        <form method="POST">
+            {% csrf_token %}
+
+            <label>Number of tokens</label>
+            <input type="number" name="quantity" min="1" value="1" required>
+
+            <label>Select Candidate</label>
+            <select name="candidate" required>
+                {% for candidate in candidates %}
+                    <option value="{{ candidate.id }}">
+                        {{ candidate.name }} ({{ candidate.position.name }})
+                    </option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" name="generate_manager">
+                Generate Manager Token
+            </button>
+        </form>
+
+        {% if manager_token %}
+            <h3>Manager Token Created</h3>
+            <div class="token-card">
+                <input type="text" value="{{ manager_token }}" readonly>
+                <button type="button" onclick="copyInline(this, '{{ manager_token }}')">
+                    Copy
+                </button>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- All Tokens -->
+    <div class="card">
+        <h2>All Tokens</h2>
+
+        {% for token in tokens %}
+        <div class="token-card">
+            <input type="text" value="{{ token.token }}" id="token{{ token.id }}" readonly>
+            <button type="button" onclick="copyToken('token{{ token.id }}', this)">
+                Copy
+            </button>
+
+            {% if token.is_active %}
+                <span class="active">Active</span>
+            {% else %}
+                <span class="inactive">Used</span>
+            {% endif %}
+        </div>
         {% endfor %}
-    </select>
-
-    <button type="submit" name="generate_manager">
-        Generate Manager Token
-    </button>
-</form>
-
-{% if manager_token %}
-    <h3>Manager Token Created</h3>
-    <input type="text" value="{{ manager_token }}" readonly>
-    <button onclick="navigator.clipboard.writeText('{{ manager_token }}')">
-        Copy
-    </button>
-{% endif %}
-
-<h2>All Tokens</h2>
-<p>DEBUG: {{ generated_token }}</p>
-
-{% for token in tokens %}
-<div class="token-card">
-    <input type="text" value="{{ token.token }}" id="token{{ token.id }}" readonly>
-    <button type="button" onclick="copyToken('token{{ token.id }}')">
-        📋 Copy
-    </button>
-
-    {% if token.is_active %}
-        <span class="active">Active</span>
-    {% else %}
-        <span class="inactive">Used</span>
-    {% endif %}
-</div>
-{% endfor %}
+    </div>
 
 </div>
 
 <script>
-function copyToken(id) {
+function copyToken(id, btn) {
     const input = document.getElementById(id);
-    navigator.clipboard.writeText(input.value);
+    
+    navigator.clipboard.writeText(input.value).then(() => {
+        const originalText = btn.innerText;
+        btn.innerText = "Copied";
+        btn.disabled = true;
+
+        setTimeout(() => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }, 2000);
+    });
+}
+
+function copyInline(btn, value) {
+    navigator.clipboard.writeText(value).then(() => {
+        const originalText = btn.innerText;
+        btn.innerText = "Copied";
+        btn.disabled = true;
+
+        setTimeout(() => {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }, 2000);
+    });
 }
 </script>
+
+</body>
+</html>

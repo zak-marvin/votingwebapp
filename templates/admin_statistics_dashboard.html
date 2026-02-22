@@ -120,16 +120,13 @@
     font-size: 0.875rem;
   }
 
-  /* Input group with icon */
   .input-group {
     position: relative;
     margin-bottom: 0.5rem;
-    width: 100%;
   }
   .input-group input {
     width: 100%;
-    box-sizing: border-box; /* important: padding stays inside card */
-    padding: 0.75rem 0.75rem 0.75rem 2.5rem; /* space for icon */
+    padding: 0.75rem 0.75rem 0.75rem 2.5rem;
     border: 1px solid var(--border-light);
     border-radius: 0.5rem;
     font-family: monospace;
@@ -148,7 +145,6 @@
     top: 50%;
     transform: translateY(-50%);
     color: #9ca3af;
-    pointer-events: none;
   }
 
   .card p.note {
@@ -184,7 +180,7 @@
     padding: 0.5rem;
     border-radius: 0.5rem;
     font-size: 0.875rem;
-    margin-bottom: 0.75rem;
+    margin-top: 0.5rem;
   }
   .dark-mode .error-msg {
     background-color: rgba(248, 113, 113, 0.2);
@@ -277,7 +273,7 @@
       </div>
       <p class="note">Tokens are sensitive and case-insensitive. Never share your token with anyone.</p>
       <button type="submit">
-        Submit <span class="material-symbols-outlined">arrow_forward</span>
+        Submit Vote <span class="material-symbols-outlined">arrow_forward</span>
       </button>
     </form>
   </div>

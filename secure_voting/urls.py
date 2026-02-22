@@ -23,7 +23,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from users.views import login_choice, admin_login, manager_login
 from elections.views import admin_dashboard, manager_dashboard
-from voting.views import admin_tokens, export_tokens
+from voting.views import admin_tokens, export_tokens,admin_statistics
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home, name="home"),
@@ -34,7 +34,9 @@ path('login/admin/', admin_login),
 path('login/manager/', manager_login),
 path('dashboard/admin/tokens/', admin_tokens, name="admin_tokens"),
 path('dashboard/admin/export/', export_tokens, name="export_tokens"),
+path('statistics/', admin_statistics, name="statistics"),
 path('dashboard/admin/', admin_dashboard, name="admin_dashboard"),
+path('dashboard/manager/', manager_dashboard, name="manager_dashboard"),
 path('dashboard/manager/', manager_dashboard, name="manager_dashboard"),
 ]
 

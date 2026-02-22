@@ -17,6 +17,83 @@ from django.db.models import F
 from django_ratelimit.decorators import ratelimit
 from .models import VoterToken, Vote
 from elections.models import Position, Candidate
+from django.db.models import Count
+from django.db.models.functions import TruncHour
+from django.http import JsonResponse
+from .models import Vote
+from elections.models import Candidate
+from django.db.models import Count
+from django.http import JsonResponse
+from voting.models import Vote, ManagerToken
+from elections.models import Candidate, Position
+
+def admin_statistics(request):
+
+    total_votes = Vote.objects.count()
+    total_tokens = ManagerToken.objects.count()
+    used_tokens = ManagerToken.objects.filter(is_active=True).count()
+
+    positions_data = []
+
+    for position in Position.objects.all():
+        candidates = Candidate.objects.filter(position=position).annotate(
+            total_votes=Count('vote')
+        ).order_by('-vote_count')
+
+        positions_data.append({
+            "position": position.name,
+            "candidates": [
+                {
+                    "name": c.name,
+                    "votes": c.vote_count
+                }
+                for c in candidates
+            ]
+        })
+
+    return JsonResponse({
+        "total_votes": total_votes,
+        "turnout_percentage": round((used_tokens / total_tokens) * 100, 2) if total_tokens else 0,
+        "positions": positions_data
+    })
+
+def manager_live_stats(request):
+    candidate = request.user.candidate
+
+    total_votes = Vote.objects.filter(
+        candidate__position=candidate.position
+    ).count()
+
+    candidate_votes = Vote.objects.filter(
+        candidate=candidate
+    ).count()
+
+    percentage = round((candidate_votes / total_votes) * 100, 2) if total_votes > 0 else 0
+
+    candidates_with_votes = Candidate.objects.filter(
+        position=candidate.position
+    ).annotate(
+        vote_count=Count('vote_set')   # <-- THIS IS THE FIX
+    ).order_by('-vote_count')
+
+    ranking = 1
+    for idx, c in enumerate(candidates_with_votes, start=1):
+        if c.id == candidate.id:
+            ranking = idx
+            break
+
+    leader = candidates_with_votes.first()
+    leader_votes = leader.vote_count if leader else 0
+
+    vote_diff = max(leader_votes - candidate_votes, 0)
+
+    return JsonResponse({
+        "votes": candidate_votes,
+        "percentage": percentage,
+        "ranking": ranking,
+        "vote_diff": vote_diff,
+        "leader_votes": leader_votes
+    })
 @login_required
 @login_required
 def admin_tokens(request):

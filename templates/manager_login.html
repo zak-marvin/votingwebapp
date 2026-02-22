@@ -1,11 +1,109 @@
-<h2>Campaign Manager Login</h2>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoteSafe | Campaign Manager Login</title>
 
-<form method="POST">
-    {% csrf_token %}
-    <input type="text" name="token" placeholder="Enter manager token" required>
-    <button type="submit">Login</button>
-</form>
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 
-{% if error %}
-<p style="color:red">{{ error }}</p>
-{% endif %}
+<style>
+body {
+    margin: 0;
+    font-family: 'Public Sans', sans-serif;
+    background: #f8fafc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-card {
+    background: white;
+    width: 100%;
+    max-width: 400px;
+    padding: 2.5rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.logo span {
+    font-size: 40px;
+    color: #135bec;
+}
+
+.logo h2 {
+    margin: 0.5rem 0 0;
+}
+
+input {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+input:focus {
+    outline: none;
+    border-color: #135bec;
+    box-shadow: 0 0 0 4px rgba(19,91,236,0.1);
+}
+
+button {
+    width: 100%;
+    padding: 0.8rem;
+    border-radius: 10px;
+    border: none;
+    background: #135bec;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button:hover {
+    background: #0e46b8;
+}
+
+.error {
+    color: #dc2626;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    text-align: center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="login-card">
+    <div class="logo">
+        <span class="material-symbols-outlined">analytics</span>
+        <h2>Campaign Manager Login</h2>
+    </div>
+
+    <form method="POST">
+        {% csrf_token %}
+        <input type="text" name="token" placeholder="Enter manager token" required>
+        <button type="submit">Login</button>
+
+        {% if error %}
+        <p class="error">{{ error }}</p>
+        {% endif %}
+    </form>
+</div>
+
+</body>
+</html>
